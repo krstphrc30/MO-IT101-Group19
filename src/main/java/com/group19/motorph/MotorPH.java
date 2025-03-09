@@ -63,7 +63,6 @@ public class MotorPH {
             System.out.println("Employee with ID " + employeeNumber + " not found.");
         } catch (Exception e) {
             System.out.println("Error reading employee file: " + e.getMessage());
-            e.printStackTrace(); // Add stack trace for debugging
         }
     }
 
@@ -90,7 +89,6 @@ public class MotorPH {
             }
         } catch (Exception e) {
             System.out.println("Error reading employee file: " + e.getMessage());
-            e.printStackTrace(); // Add stack trace for debugging
         }
     }
 
@@ -159,7 +157,6 @@ public class MotorPH {
             }
         } catch (Exception e) {
             System.out.println("Error reading attendance file: " + e.getMessage());
-            e.printStackTrace(); // Add stack trace for debugging
             return;
         }
 
@@ -172,7 +169,7 @@ public class MotorPH {
             Duration overtimeDuration = entry.getValue()[1];
 
             double baseSalary = (workDuration.toMinutes() / 60.0 * hourlyRate);
-            double overtimePay = (overtimeDuration.toMinutes() / 60.0 * hourlyRate * 0.25);
+            double overtimePay = (overtimeDuration.toMinutes() / 60.0 * hourlyRate * 0.25); //An additional 25%(hourly rate) pay for overtime hours
             double grossSalary = baseSalary + overtimePay;
             double totalAllowances = (riceSubsidy + phoneAllowance + clothingAllowance) / 4.0;
 
@@ -277,13 +274,13 @@ public class MotorPH {
             System.out.println("Total Overtime          : " + overtimeDuration.toHours() + "h " + overtimeDuration.toMinutesPart() + "m");
             System.out.println("Base Salary             : PHP " + String.format("%.2f", baseSalary));
             System.out.println("Overtime Pay            : PHP " + String.format("%.2f", overtimePay));
-            System.out.println("\nGross Salary            : PHP " + String.format("%.2f", grossSalary));
+            System.out.println("Gross Salary            : PHP " + String.format("%.2f", grossSalary));
             System.out.println("SSS Contribution        : PHP " + String.format("-%.2f", sssContribution));
             System.out.println("PhilHealth Contribution : PHP " + String.format("-%.2f", philHealthContribution));
             System.out.println("Pag-Ibig Contribution   : PHP " + String.format("-%.2f", pagIbigContribution));
             System.out.println("Withholding Tax         : PHP " + String.format("-%.2f", withholdingTax));
-            System.out.println("\nTotal Deductions        : PHP " + String.format("-%.2f",  totalDeduction));
-            System.out.println("\nAllowances              : PHP " + String.format("%.2f", totalAllowances));
+            System.out.println("Total Deductions        : PHP " + String.format("-%.2f",  totalDeduction));
+            System.out.println("Allowances              : PHP " + String.format("%.2f", totalAllowances));
             System.out.println("\nNet Salary              : PHP " + String.format("%.2f", finalPay));
             System.out.println("--------------------------------------------------");
         }
