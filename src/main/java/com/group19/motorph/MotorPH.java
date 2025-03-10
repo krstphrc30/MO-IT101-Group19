@@ -169,7 +169,7 @@ public class MotorPH {
             Duration overtimeDuration = entry.getValue()[1];
 
             double baseSalary = (workDuration.toMinutes() / 60.0 * hourlyRate);
-            double overtimePay = (overtimeDuration.toMinutes() / 60.0 * hourlyRate * 0.25); //An additional 25%(hourly rate) pay for overtime hours
+            double overtimePay = (overtimeDuration.toMinutes() / 60.0 * hourlyRate * 1.25); //An additional 25%(hourly rate) pay for overtime hours
             double grossSalary = baseSalary + overtimePay;
             double totalAllowances = (riceSubsidy + phoneAllowance + clothingAllowance) / 4.0;
 
