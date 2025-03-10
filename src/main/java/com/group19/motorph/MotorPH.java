@@ -268,7 +268,7 @@ public class MotorPH {
             double netSalary = grossSalary - withholdingTax - sssContribution - philHealthContribution - pagIbigContribution;
             double finalPay = netSalary + totalAllowances;
 
-            // Updated output with allowances
+            
             System.out.println("Week Period             : " + startOfWeek + " - " + endOfWeek);
             System.out.println("Total Hours Worked      : " + workDuration.toHours() + "h " + workDuration.toMinutesPart() + "m");
             System.out.println("Total Overtime          : " + overtimeDuration.toHours() + "h " + overtimeDuration.toMinutesPart() + "m");
