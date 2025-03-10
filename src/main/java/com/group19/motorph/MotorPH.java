@@ -266,7 +266,7 @@ public class MotorPH {
             } else if (grossSalary <= 24750) {
                 sssContribution = 1102.50 / 4;       
             } else {
-                sssContribution = 1125.00 / 4; // 
+                sssContribution = 1125.00 / 4; // Maximum SSS Contribution
             }
 
             double philHealthContribution = 0.0;
