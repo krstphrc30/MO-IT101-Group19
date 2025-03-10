@@ -173,7 +173,7 @@ public class MotorPH {
             double grossSalary = baseSalary + overtimePay;
             double totalAllowances = (riceSubsidy + phoneAllowance + clothingAllowance) / 4.0;
 
-            // Deduction calculations
+            // calculation of SSS contribution deduction
             double sssContribution = 0.0;
             if (grossSalary < 3250) {
                 sssContribution = 135.00 / 4;
@@ -269,6 +269,7 @@ public class MotorPH {
                 sssContribution = 1125.00 / 4; // Maximum SSS Contribution
             }
 
+            // calculation of Philhealth contribution deduction
             double philHealthContribution = 0.0;
             double monthlyPremium = grossSalary * 0.03; // 3% of Monthly Basic Salary
             if (grossSalary <= 10000) {
@@ -279,6 +280,7 @@ public class MotorPH {
                 philHealthContribution = 1800 / 2; // Max PhilHealth contribution (50%)
             }
 
+            // calculation of Pag-ibig contribution deduction
             double pagIbigContribution = 0.0;
             if (grossSalary <= 1500) {
                 pagIbigContribution = grossSalary * 0.01; // Employee's share (1%)
@@ -289,6 +291,7 @@ public class MotorPH {
                 pagIbigContribution = 100.00 / 4;
             }
 
+            // calculation of withholding tax deduction
             double withholdingTax = 0.0;
             if (grossSalary <= 5208) {
                 withholdingTax = 0.0;
