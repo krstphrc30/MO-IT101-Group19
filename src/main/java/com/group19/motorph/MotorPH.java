@@ -7,51 +7,64 @@
 
 package com.group19.motorph;
 
-import com.opencsv.CSVReader;
-import java.io.*;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.*;
+import com.opencsv.CSVReader;                           // Library for reading CSV files
+import java.io.*;                                       // For file input/output operations
+import java.time.*;                                     // For date and time calculations
+import java.time.format.DateTimeFormatter;              // For parsing and formatting dates/times
+import java.time.format.DateTimeParseException;         // For handling date/time parsing errors
+import java.util.*;                                     // For collections like ArrayList and TreeMap
 
 public class MotorPH {
     
-    private static final double OVERTIME_RATE = 1.25; // Overtime pay multiplier
-    private static final int WEEKLY_PAYMENTS = 4; // Number of weeks in a month
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H:mm");
+    // Constants used throughout the payroll calculations
+    private static final double OVERTIME_RATE = 1.25; // Overtime pay rate multiplier (25% above regular rate)
+    private static final int WEEKLY_PAYMENTS = 4;     // Number of weeks in a month for converting monthly amounts to weekly
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy");      // Date format for parsing CSV dates
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("H:mm");            // Time format for parsing CSV times (24-hour)
+    
+    /**
+     * Main entry point of the MotorPH payroll system. Displays a menu to the user,
+     * allowing them to choose between computing payroll for a specific employee or all employees.
+     * Handles user input and initiates the payroll processing accordingly.
+     *
+     * @param args Command-line arguments (not used in this implementation)
+     */
     
     public static void main(String[] args) {
-        String employeeFilePath = "src/main/employeedata.csv";
-        String attendanceFilePath = "src/main/attendancerecord.csv";
+        // Define file paths for employee and attendance data
+        String employeeFilePath = "src/main/employeedata.csv";          // Path to CSV containing employee details
+        String attendanceFilePath = "src/main/attendancerecord.csv";    // Path to CSV containing attendance records
 
-        Scanner inputScanner = new Scanner(System.in);
-        boolean validInput = false;
+        Scanner inputScanner = new Scanner(System.in);                  // Scanner object to read user input from console
+        boolean validInput = false;                                     // Flag to control the menu loop until valid input is received
         
+        // Menu loop to prompt user for payroll processing options
         while (!validInput) {
-        System.out.println("Welcome to MotorPH Payroll!");
-        System.out.println("[1] Compute Payroll for a Specific Employee");
-        System.out.println("[2] Compute Payroll for All Employees");
-        System.out.print("Enter selection: ");
+        System.out.println("Welcome to MotorPH Payroll!");                  // Welcome message
+        System.out.println("[1] Compute Payroll for a Specific Employee");  // Option 1
+        System.out.println("[2] Compute Payroll for All Employees");        // Option 2
+        System.out.print("Enter selection: ");                              // Promp for user input
         
         // Check if input is an integer
-    if (inputScanner.hasNext()) {
-        int choice = inputScanner.nextInt();
+    if (inputScanner.hasNext()) {                                           // Read the integer choice
+        int choice = inputScanner.nextInt();                                // Consume the newline character after the integer
         inputScanner.nextLine(); // Consume newline
         
         switch (choice) {
             case 1 -> {
-                System.out.print("\nEnter Employee Number: ");
-                String searchEmployeeNumber = inputScanner.nextLine().trim();
+                // Option 1: Compute payroll for a specific employee
+                System.out.print("\nEnter Employee Number: ");                  // Prompt for employee ID
+                String searchEmployeeNumber = inputScanner.nextLine().trim();   // Read and trim the input
 
                 if (searchEmployeeNumber.isEmpty()) {
-                    System.out.println("No input provided. Please try again.");
+                    System.out.println("No input provided. Please try again."); // Handle empty input
                     continue; // Loop back to selection
                 }
                 processPayrollForEmployee(searchEmployeeNumber, employeeFilePath, attendanceFilePath);
                 validInput = true; // Exit loop after successful processing
             }
             case 2 -> {
+                // Option 2: Compute payroll for all employees
                 processPayrollForAllEmployees(employeeFilePath, attendanceFilePath);
                 validInput = true; // Exit loop after successful processing
             }
@@ -59,11 +72,20 @@ public class MotorPH {
             }
         } else {
             System.out.println("Invalid input. Please enter a number (1 or 2");
-            inputScanner.nextLine();
+            inputScanner.nextLine();    // Clear the invalid input
         }
     }
-        inputScanner.close();
+        inputScanner.close();           // Close the scanner to free system resources
     }
+    /**
+     * Processes payroll for a specific employee identified by their employee number.
+     * Reads employee data from the CSV file, extracts relevant details, and initiates
+     * payroll calculation based on attendance records.
+     *
+     * @param employeeNumber The ID of the employee to process payroll for
+     * @param employeeFilePath Path to the employee data CSV file
+     * @param attendanceFilePath Path to the attendance records CSV file
+     */
     
     private static void processPayrollForEmployee(String employeeNumber, String employeeFilePath, String attendanceFilePath) {
         try (CSVReader reader = new CSVReader(new FileReader(employeeFilePath))) {
@@ -77,27 +99,34 @@ public class MotorPH {
                     double riceSubsidy = Double.parseDouble(employeeData[14].trim().replaceAll("\"", "").replace(",", ""));
                     double phoneAllowance = Double.parseDouble(employeeData[15].trim().replaceAll("\"", "").replace(",", ""));
                     double clothingAllowance = Double.parseDouble(employeeData[16].trim().replaceAll("\"", "").replace(",", ""));
+                    
+                    // Display basic employee information
                     System.out.println("-------------------------------------------------");
                     System.out.println("Name: " + fullName);
                     System.out.println("Birthday: " + birthDay);
                     System.out.println("-------------------------------------------------");
+                    
+                    // Calculate and display payroll based on attendance
                     calculateWeeklyWorkHours(employeeNumber, fullName, hourlyRate, riceSubsidy, phoneAllowance, clothingAllowance, attendanceFilePath);
                     return;
                 }
             }
-            System.out.println("Employee with ID " + employeeNumber + " not found.");
+            System.out.println("Employee with ID " + employeeNumber + " not found.");       // Employee not found in CSV
         } catch (Exception e) {
-            System.out.println("Error reading employee file: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error reading employee file: " + e.getMessage());           // Display error message
+            e.printStackTrace(); // Print stack trace for debugging
+            e.printStackTrace(); // Print stack trace for debugging   
         }
     }
 
     private static void processPayrollForAllEmployees(String employeeFilePath, String attendanceFilePath) {
         try (CSVReader reader = new CSVReader(new FileReader(employeeFilePath))) {
-            reader.readNext(); // Skip header
-            String[] employeeData;
-            while ((employeeData = reader.readNext()) != null) {
-                if (employeeData.length >= 19) {
+            reader.readNext(); // Skip the header row
+            String[] employeeData;      // Array to hold each row of employee data
+            while ((employeeData = reader.readNext()) != null) {                            // Read each row until end of file
+                if (employeeData.length >= 19) {                                            // Ensure row has enough columns
+                    
+                    // Extract employee details
                     String employeeNumber = employeeData[0].trim();
                     String fullName = employeeData[1].trim() + ", " + employeeData[2].trim();
                     String birthDay = employeeData[3].trim();
@@ -105,60 +134,89 @@ public class MotorPH {
                     double riceSubsidy = Double.parseDouble(employeeData[14].trim().replaceAll("\"", "").replace(",", ""));
                     double phoneAllowance = Double.parseDouble(employeeData[15].trim().replaceAll("\"", "").replace(",", ""));
                     double clothingAllowance = Double.parseDouble(employeeData[16].trim().replaceAll("\"", "").replace(",", ""));
+                    
+                    // Display employee information (employee number, full name and birtday)
                     System.out.println("-------------------------------------------------");
                     System.out.println("Employee Number: " + employeeNumber);
                     System.out.println("Name: " + fullName);
                     System.out.println("Birthday: " + birthDay);
                     System.out.println("-------------------------------------------------");
+                    
+                    // Calculate and display payroll for this employee
                     calculateWeeklyWorkHours(employeeNumber, fullName, hourlyRate, riceSubsidy, phoneAllowance, clothingAllowance, attendanceFilePath);
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error reading employee file: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error reading employee file: " + e.getMessage());           // Display error message
+            e.printStackTrace(); // Print stack trace for debugging
         }
     }
 /**
-     * Orchestrates the payroll calculation process for an employee.
+     * Orchestrates the payroll calculation process for an employee by processing their
+     * attendance data and displaying the payroll summary. This method acts as a bridge
+     * between attendance processing and payroll calculation/display.
+     *
+     * @param employeeId Employee's ID number
+     * @param fullName Employee's full name
+     * @param hourlyRate Employee's hourly pay rate
+     * @param riceSubsidy Monthly rice subsidy amount
+     * @param phoneAllowance Monthly phone allowance amount
+     * @param clothingAllowance Monthly clothing allowance amount
+     * @param attendanceFilePath Path to the attendance records CSV file
      */
+    
     private static void calculateWeeklyWorkHours(String employeeId, String fullName, double hourlyRate,
                                                  double riceSubsidy, double phoneAllowance, double clothingAllowance,
                                                  String attendanceFilePath) {
-        TreeMap<LocalDate, Duration[]> weeklyRecords = processAttendanceData(employeeId, attendanceFilePath);
+        TreeMap<LocalDate, Duration[]> weeklyRecords = processAttendanceData(employeeId, attendanceFilePath);       // Process attendance data from attendance CSV file.
         if (weeklyRecords.isEmpty()) {
-            System.out.println("No valid attendance records found for " + fullName);
+            System.out.println("No valid attendance records found for " + fullName);        // No records found
             return;
         }
-        calculateAndDisplayPayroll(fullName, weeklyRecords, hourlyRate, riceSubsidy, phoneAllowance, clothingAllowance);
+        calculateAndDisplayPayroll(fullName, weeklyRecords, hourlyRate, riceSubsidy, phoneAllowance, clothingAllowance);        // Calculate and display payroll
     }
 
     /**
-     * Processes attendance data and returns weekly work and overtime durations.
+     * Processes attendance data from the CSV file for a given employee and organizes it
+     * into weekly records of regular work hours and overtime hours.
+     *
+     * @param employeeId Employee's ID number
+     * @param attendanceFilePath Path to the attendance records CSV file
+     * @return TreeMap with week start dates as keys and arrays of [workDuration, overtimeDuration] as values
      */
     private static TreeMap<LocalDate, Duration[]> processAttendanceData(String employeeId, String attendanceFilePath) {
-        LocalTime workStart = LocalTime.of(8, 0);
-        LocalTime graceEnd = workStart.plusMinutes(10);
-        LocalTime workEnd = LocalTime.of(17, 0);
-        Duration breakTime = Duration.ofHours(1);
-        TreeMap<LocalDate, Duration[]> weeklyRecords = new TreeMap<>();
+        // Define standard work hours and break time
+        LocalTime workStart = LocalTime.of(8, 0);                                   // Standard start time (8:00 AM)  
+        LocalTime graceEnd = workStart.plusMinutes(10);                             // Grace period end (8:10 AM)
+        LocalTime workEnd = LocalTime.of(17, 0);                                    // Standard end time (5:00 PM)
+        Duration breakTime = Duration.ofHours(1);                                   // 1-hour break deduction per day                                   
+        TreeMap<LocalDate, Duration[]> weeklyRecords = new TreeMap<>();             // Store weekly work and overtime durations
 
         try (CSVReader reader = new CSVReader(new FileReader(attendanceFilePath))) {
-            reader.readNext(); // Skip header
-            String[] attendanceRecord;
-            while ((attendanceRecord = reader.readNext()) != null) {
-                if (attendanceRecord.length >= 6 && attendanceRecord[0].trim().equals(employeeId)) {
-                    processSingleAttendanceRecord(attendanceRecord, weeklyRecords, workStart, graceEnd, workEnd, breakTime);
+            reader.readNext(); // Skip the header row
+            String[] attendanceRecord;          // Array to hold each attendance record
+            while ((attendanceRecord = reader.readNext()) != null) {                // Read each row until end of file
+                if (attendanceRecord.length >= 6 && attendanceRecord[0].trim().equals(employeeId)) {        // Match employee ID
+                    processSingleAttendanceRecord(attendanceRecord, weeklyRecords, workStart, graceEnd, workEnd, breakTime);       // Process the record
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error reading attendance file: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error reading attendance file: " + e.getMessage());         // Display error message
+            e.printStackTrace();               // Print stack trace for debugging
         }
-        return weeklyRecords;
+        return weeklyRecords;                  // Return the compiled weekly records
     }
 
     /**
-     * Processes a single attendance record and updates weekly durations.
+     * Processes a single attendance record to calculate regular work and overtime durations
+     * for a day, then updates the weekly records accordingly.
+     *
+     * @param attendanceRecord Array containing attendance data for a day
+     * @param weeklyRecords TreeMap to store weekly durations
+     * @param workStart Regular start time
+     * @param graceEnd Grace period end time
+     * @param workEnd Regular end time
+     * @param breakTime Daily break duration to deduct
      */
     private static void processSingleAttendanceRecord(String[] attendanceRecord, TreeMap<LocalDate, Duration[]> weeklyRecords,
                                                       LocalTime workStart, LocalTime graceEnd, LocalTime workEnd, Duration breakTime) {
@@ -166,41 +224,49 @@ public class MotorPH {
         String logInStr = attendanceRecord[4].trim();
         String logOutStr = attendanceRecord[5].trim();
 
-        if (logInStr.isEmpty() || logOutStr.isEmpty()) return;
+        if (logInStr.isEmpty() || logOutStr.isEmpty()) return;      // Skip records with missing times
 
         try {
-            LocalDate date = LocalDate.parse(dateStr, DATE_FORMATTER);
-            if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) return;
+            LocalDate date = LocalDate.parse(dateStr, DATE_FORMATTER);      // Parse the date
+            if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) return;       // Skip weekends
 
-            LocalTime logIn = LocalTime.parse(logInStr, TIME_FORMATTER);
-            LocalTime logOut = LocalTime.parse(logOutStr, TIME_FORMATTER);
+            LocalTime logIn = LocalTime.parse(logInStr, TIME_FORMATTER);            // Parse login time
+            LocalTime logOut = LocalTime.parse(logOutStr, TIME_FORMATTER);          // Parse logout time
 
             if (logOut.isBefore(logIn)) {
-                System.out.println("Error: Invalid time record for " + attendanceRecord[0] + " on " + dateStr);
+                System.out.println("Error: Invalid time record for " + attendanceRecord[0] + " on " + dateStr);     // Invalid time range
                 return;
             }
 
-            boolean isLate = logIn.isAfter(graceEnd);
-            if (logIn.isAfter(workStart) && logIn.isBefore(graceEnd)) logIn = workStart;
+            boolean isLate = logIn.isAfter(graceEnd);                                           // Check if employee is late beyond grace period
+            if (logIn.isAfter(workStart) && logIn.isBefore(graceEnd)) logIn = workStart;        // Adjust login within grace period
 
-            LocalTime adjustedLogOut = logOut.isAfter(workEnd) ? workEnd : logOut;
-            Duration workDuration = Duration.between(logIn, adjustedLogOut).minus(breakTime);
-            workDuration = workDuration.isNegative() ? Duration.ZERO : workDuration;
+            LocalTime adjustedLogOut = logOut.isAfter(workEnd) ? workEnd : logOut;              // Cap regular hours at workEnd
+            Duration workDuration = Duration.between(logIn, adjustedLogOut).minus(breakTime);   // Calculate regular work hours minus break
+            workDuration = workDuration.isNegative() ? Duration.ZERO : workDuration;            // Ensure no negative duration
 
-            Duration overtimeDuration = (!isLate && logOut.isAfter(workEnd)) ? Duration.between(workEnd, logOut) : Duration.ZERO;
+            Duration overtimeDuration = (!isLate && logOut.isAfter(workEnd)) ? Duration.between(workEnd, logOut) : Duration.ZERO;      // Calculate overtime if not late
 
-            LocalDate weekStart = date.with(DayOfWeek.MONDAY);
-            weeklyRecords.putIfAbsent(weekStart, new Duration[]{Duration.ZERO, Duration.ZERO});
-            Duration[] durations = weeklyRecords.get(weekStart);
-            durations[0] = durations[0].plus(workDuration);
-            durations[1] = durations[1].plus(overtimeDuration);
+            LocalDate weekStart = date.with(DayOfWeek.MONDAY);                                  // Determine the Monday of the week
+            weeklyRecords.putIfAbsent(weekStart, new Duration[]{Duration.ZERO, Duration.ZERO}); // Initialize week if not present
+            Duration[] durations = weeklyRecords.get(weekStart);                                // Get existing durations
+            durations[0] = durations[0].plus(workDuration);                                     // Add regular hours
+            durations[1] = durations[1].plus(overtimeDuration);                                 // Add overtime hours
         } catch (DateTimeParseException e) {
-            System.out.println("Error parsing attendance date/time for " + attendanceRecord[0] + " on " + dateStr);
+            System.out.println("Error parsing attendance date/time for " + attendanceRecord[0] + " on " + dateStr);     // Parsing error
         }
     }
 
     /**
-     * Calculates payroll and displays the summary.
+     * Calculates payroll components (base salary, overtime pay, deductions, allowances)
+     * for each week and displays the summary to the user.
+     *
+     * @param fullName Employee's full name
+     * @param weeklyRecords TreeMap of weekly work and overtime durations
+     * @param hourlyRate Employee's hourly pay rate
+     * @param riceSubsidy Monthly rice subsidy
+     * @param phoneAllowance Monthly phone allowance
+     * @param clothingAllowance Monthly clothing allowance
      */
     private static void calculateAndDisplayPayroll(String fullName, TreeMap<LocalDate, Duration[]> weeklyRecords,
                                                    double hourlyRate, double riceSubsidy, double phoneAllowance,
@@ -208,27 +274,29 @@ public class MotorPH {
         System.out.println("\nWeekly Salary Summary for " + fullName + ":");
         System.out.println("-------------------------------------------------");
 
-        for (Map.Entry<LocalDate, Duration[]> entry : weeklyRecords.entrySet()) {
-            LocalDate startOfWeek = entry.getKey();
-            LocalDate endOfWeek = startOfWeek.plusDays(4);
-            Duration workDuration = entry.getValue()[0];
-            Duration overtimeDuration = entry.getValue()[1];
+        for (Map.Entry<LocalDate, Duration[]> entry : weeklyRecords.entrySet()) {           // Iterate through each week's records
+            LocalDate startOfWeek = entry.getKey();                                         // Start of the week (Monday)
+            LocalDate endOfWeek = startOfWeek.plusDays(4);                                  // End of the week (Friday, assuming 5-day work week)   
+            Duration workDuration = entry.getValue()[0];                                    // Total regular work hours
+            Duration overtimeDuration = entry.getValue()[1];                                // Total overtime hours
 
-            double baseSalary = workDuration.toMinutes() / 60.0 * hourlyRate;
-            double overtimePay = overtimeDuration.toMinutes() / 60.0 * hourlyRate * OVERTIME_RATE;
-            double grossSalary = baseSalary + overtimePay;
-            double totalAllowances = (riceSubsidy + phoneAllowance + clothingAllowance) / WEEKLY_PAYMENTS;
+            // Calculate salary components
+            double baseSalary = workDuration.toMinutes() / 60.0 * hourlyRate;                               // Convert minutes to hours and multiply by rate
+            double overtimePay = overtimeDuration.toMinutes() / 60.0 * hourlyRate * OVERTIME_RATE;          // Overtime pay with multiplier
+            double grossSalary = baseSalary + overtimePay;                                                  // Total salary before deductions
+            double totalAllowances = (riceSubsidy + phoneAllowance + clothingAllowance) / WEEKLY_PAYMENTS;  // Weekly portion of monthly allowances
 
-            // Calculate deductions using helper functions
-            double sssContribution = calculateSSSContribution(grossSalary);
-            double philHealthContribution = calculatePhilHealthContribution(grossSalary);
-            double pagIbigContribution = calculatePagIbigContribution(grossSalary);
-            double withholdingTax = calculateWithholdingTax(grossSalary);
-            double totalDeductions = sssContribution + philHealthContribution + pagIbigContribution;
+            // Calculate statutory deductions
+            double sssContribution = calculateSSSContribution(grossSalary);                             // SSS contribution
+            double philHealthContribution = calculatePhilHealthContribution(grossSalary);               // PhilHealth contribution
+            double pagIbigContribution = calculatePagIbigContribution(grossSalary);                     // Pag-IBIG contribution
+            double withholdingTax = calculateWithholdingTax(grossSalary);                               // Withholding tax
+            double totalDeductions = sssContribution + philHealthContribution + pagIbigContribution;    // Sum of deductions
 
-            double netSalary = grossSalary - totalDeductions - withholdingTax;
-            double finalPay = netSalary + totalAllowances;
+            double netSalary = grossSalary - totalDeductions - withholdingTax;                          // Salary after deductions and tax
+            double finalPay = netSalary + totalAllowances;                                              // Final pay including allowances
 
+            // Display the payroll details for the week
             printPayrollDetails(startOfWeek, endOfWeek, workDuration, overtimeDuration, baseSalary, overtimePay,
                     grossSalary, sssContribution, philHealthContribution, pagIbigContribution, totalDeductions,
                     withholdingTax, totalAllowances, finalPay);
@@ -236,19 +304,24 @@ public class MotorPH {
     }
 
     /**
-     * Calculates SSS contribution based on gross salary.
+     * Calculates the SSS (Social Security System) contribution based on the weekly gross salary.
+     * Uses a predefined contribution table to determine the amount, which is then converted to a weekly value.
+     *
+     * @param grossSalary Weekly gross salary (base + overtime)
+     * @return Weekly SSS contribution amount
      */
     private static double calculateSSSContribution(double grossSalary) {
+        // Inner class to represent salary brackets and corresponding SSS contributions
         class SalaryContribution {
-            double salaryLimit;
-            double contribution;
+            double salaryLimit;     // Upper limit of the salary bracket (weekly)
+            double contribution;    // Monthly SSS contribution for the bracket
 
             SalaryContribution(double salaryLimit, double contribution) {
                 this.salaryLimit = salaryLimit;
                 this.contribution = contribution;
             }
         }
-
+        // Initialize SSS contribution table with monthly salary limits divided by 4 for weekly comparison
         ArrayList<SalaryContribution> sssTable = new ArrayList<>();
         sssTable.add(new SalaryContribution(3250.0 / 4, 135.00));
         sssTable.add(new SalaryContribution(3750.0 / 4, 157.50));
@@ -295,48 +368,79 @@ public class MotorPH {
         sssTable.add(new SalaryContribution(24250.0 / 4, 1080.00));
         sssTable.add(new SalaryContribution(24750.0 / 4, 1102.50));
 
-        double sssContribution = 0.0;
-        for (SalaryContribution sssEntry : sssTable) {
-            if (grossSalary <= sssEntry.salaryLimit) {
-                sssContribution = sssEntry.contribution / WEEKLY_PAYMENTS;
-                break;
+        double sssContribution = 0.0;                                       // Default contribution
+        for (SalaryContribution sssEntry : sssTable) {                      // Iterate through the table
+            if (grossSalary <= sssEntry.salaryLimit) {                      // Find the first bracket that fits
+                sssContribution = sssEntry.contribution / WEEKLY_PAYMENTS;  // Convert monthly to weekly
+                break;  // Exit loop once contribution is found
             }
         }
+        // If salary exceeds highest bracket, use the maximum contribution (converted to weekly)
         return (sssContribution == 0.0) ? 1125.00 / WEEKLY_PAYMENTS : sssContribution;
     }
 
     /**
-     * Calculates PhilHealth contribution based on gross salary.
+     * Calculates the PhilHealth contribution based on the weekly gross salary.
+     * Applies a tiered system: minimum contribution for low salaries, percentage-based
+     * for mid-range, and a maximum cap for high salaries.
+     *
+     * @param grossSalary Weekly gross salary
+     * @return Weekly PhilHealth contribution (employee's share)
      */
     private static double calculatePhilHealthContribution(double grossSalary) {
-        double monthlyPremium = ((grossSalary * 0.03) / 2) / (4); // 3% of salary
-        if (grossSalary <= 10000 / 4) return 300 / 2 / WEEKLY_PAYMENTS; // Employee's share, weekly
-        else if (grossSalary <= 59999.99 / 4) return monthlyPremium / 2 / WEEKLY_PAYMENTS; // Employee's share, weekly
-        else return 1800 / 2 / WEEKLY_PAYMENTS; // Max contribution, weekly
+        double monthlyPremium = ((grossSalary * 0.03) / 2) / (4);                           // 3% of salary, split employer/employee, then monthly to weekly
+        if (grossSalary <= 10000 / 4) return 300 / 2 / WEEKLY_PAYMENTS;                     // Minimum contribution for salaries up to 2500 weekly
+        else if (grossSalary <= 59999.99 / 4) return monthlyPremium / 2 / WEEKLY_PAYMENTS;  // Calculated contribution up to ~15000 weekly
+        else return 1800 / 2 / WEEKLY_PAYMENTS;                                             // Maximum contribution for higher salaries, weekly
     }
 
     /**
-     * Calculates Pag-IBIG contribution based on gross salary.
+     * Calculates the Pag-ibig contribution based on the weekly gross salary.
+     * Uses a tiered rate (1% or 2%) with a monthly cap of 100, converted to weekly.
+     *
+     * @param grossSalary Weekly gross salary
+     * @return Weekly Pag-ibig contribution
      */
     private static double calculatePagIbigContribution(double grossSalary) {
-        double contribution = (grossSalary <= 1500) ? grossSalary * 0.01 : grossSalary * 0.02;
-        return Math.min(contribution, 100.00 / WEEKLY_PAYMENTS);
+        double contribution = (grossSalary <= 1500) ? grossSalary * 0.01 : grossSalary * 0.02;  // 1% if <= 1500, else 2%
+        return Math.min(contribution, 100.00 / WEEKLY_PAYMENTS);                                // Cap at 100 monthly, converted to weekly
     }
 
     /**
-     * Calculates withholding tax based on gross salary.
+     * Calculates the withholding tax based on the weekly gross salary using tax brackets.
+     * Note: This implementation may not align with the latest tax tables; consider updating
+     * based on current regulations.
+     *
+     * @param grossSalary Weekly gross salary
+     * @return Weekly withholding tax amount
      */
     private static double calculateWithholdingTax(double grossSalary) {
-        if (grossSalary <= 20832 / 4) return 0.0;
-        else if (grossSalary <= 33333 / 4) return ((grossSalary - 20833 / 4) * 0.20);
-        else if (grossSalary <= 66667 / 4) return (2500 / 4) + ((grossSalary - 33333 / 4) * 0.25);
-        else if (grossSalary <= 166667 / 4) return (10833 / 4) + ((grossSalary - 66667 / 4) * 0.30);
-        else if (grossSalary <= 666667) return (40833.33 / 4) + ((grossSalary - 166667 / 4) * 0.32);
-        else return (208333.33 / 4) + ((grossSalary - 166667) * 0.35);
+        if (grossSalary <= 20832 / 4) return 0.0;                                                       // No tax for weekly salary <= 5208
+        else if (grossSalary <= 33333 / 4) return ((grossSalary - 20833 / 4) * 0.20);                   // 20% over 5208 up to 8332.5
+        else if (grossSalary <= 66667 / 4) return (2500 / 4) + ((grossSalary - 33333 / 4) * 0.25);      // 625 + 25% over 8332.5 up to 16666.75
+        else if (grossSalary <= 166667 / 4) return (10833 / 4) + ((grossSalary - 66667 / 4) * 0.30);    // 2708.25 + 30% over 16666.75 up to 41666.75
+        else if (grossSalary <= 666667) return (40833.33 / 4) + ((grossSalary - 166667 / 4) * 0.32);    // 10208.33 + 32% over 41666.75 up to 166666.75
+        else return (208333.33 / 4) + ((grossSalary - 166667) * 0.35);                                  // 52083.33 + 35% over 166666.75
     }
 
     /**
-     * Prints payroll details for a given week.
+     * Prints a detailed payroll summary for a specific week, including hours worked,
+     * salary components, deductions, allowances, and net pay.
+     *
+     * @param startOfWeek Start date of the week
+     * @param endOfWeek End date of the week
+     * @param workDuration Total regular work hours for the week
+     * @param overtimeDuration Total overtime hours for the week
+     * @param baseSalary Base pay for regular hours
+     * @param overtimePay Additional pay for overtime hours
+     * @param grossSalary Total salary before deductions
+     * @param sssContribution SSS deduction
+     * @param philHealthContribution PhilHealth deduction
+     * @param pagIbigContribution Pag-IBIG deduction
+     * @param totalDeductions Sum of all statutory deductions
+     * @param withholdingTax Tax withheld
+     * @param totalAllowances Weekly allowances
+     * @param finalPay Net pay after all calculations
      */
     private static void printPayrollDetails(LocalDate startOfWeek, LocalDate endOfWeek, Duration workDuration,
                                             Duration overtimeDuration, double baseSalary, double overtimePay,
