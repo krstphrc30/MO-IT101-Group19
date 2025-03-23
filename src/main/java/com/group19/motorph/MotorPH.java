@@ -368,14 +368,18 @@ public class MotorPH {
         sssTable.add(new SalaryContribution(24250.0 / 4, 1080.00));
         sssTable.add(new SalaryContribution(24750.0 / 4, 1102.50));
 
-        double sssContribution = 0.0;                                       // Default contribution
-        for (SalaryContribution sssEntry : sssTable) {                      // Iterate through the table
-            if (grossSalary <= sssEntry.salaryLimit) {                      // Find the first bracket that fits
-                sssContribution = sssEntry.contribution / WEEKLY_PAYMENTS;  // Convert monthly to weekly
+        //Initialize the SSS contribution to a default value of 0.0
+        double sssContribution = 0.0;                                      
+        for (SalaryContribution sssEntry : sssTable) {                      // Iterate through the SSS contribution table to find the appropriate contribution bracket
+            if (grossSalary <= sssEntry.salaryLimit) {                      // Check if the employee's gross salary falls within the current bracket's salary limit
+                 // If the salary fits within this bracket, calculate the weekly contribution
+                 // by dividing the monthly contribution by the number of weekly payments (e.g., 4)
+                sssContribution = sssEntry.contribution / WEEKLY_PAYMENTS;  
                 break;  // Exit loop once contribution is found
             }
         }
         // If salary exceeds highest bracket, use the maximum contribution (converted to weekly)
+        // Convert the maximum monthly contribution (1125.00) to a weekly value
         return (sssContribution == 0.0) ? 1125.00 / WEEKLY_PAYMENTS : sssContribution;
     }
 
