@@ -1,7 +1,8 @@
 /*
  * Click nbfs://SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  /**
- *
+ * This class represents the motorPH payroll system.
+ * It includes the functionality for reading employee data, calculating payroll, and generating reports
  * @author Kristopher Carlo, Pil Antony, Janice, Rey
  */
 
