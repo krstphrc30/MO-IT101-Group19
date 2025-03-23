@@ -3,7 +3,7 @@
  /**
  * This class represents the motorPH payroll system.
  * It includes the functionality for reading employee data, calculating payroll, and generating reports
- * @author Kristopher Carlo, Pil Antony, Janice, Rey
+ * @author Kristopher Carlo, Pil Anthony, Janice, Rey
  */
 
 package com.group19.motorph;
@@ -40,11 +40,11 @@ public class MotorPH {
         boolean validInput = false;                                     // Flag to control the menu loop until valid input is received
         
         // Menu loop to prompt user for payroll processing options
-        while (!validInput) {
-        System.out.println("Welcome to MotorPH Payroll!");                  // Welcome message
-        System.out.println("[1] Compute Payroll for a Specific Employee");  // Option 1
-        System.out.println("[2] Compute Payroll for All Employees");        // Option 2
-        System.out.print("Enter selection: ");                              // Promp for user input
+        while (!validInput) {   // Loop until the user provides valid input
+        System.out.println("Welcome to MotorPH Payroll!");                  // Welcome message for the user
+        System.out.println("[1] Compute Payroll for a Specific Employee");  // Option 1 - Compute payroll for a single employee
+        System.out.println("[2] Compute Payroll for All Employees");        // Option 2 - Compute payroll for all employees
+        System.out.print("Enter selection: ");                              // Prompt the user to enter their choice
         
         // Check if input is an integer
     if (inputScanner.hasNext()) {                                           // Read the integer choice
